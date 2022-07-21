@@ -1,5 +1,19 @@
+# When targeting a binary, you can use this method without a genrule
 cc_binary(
-    name = "main",
+    name = "binary_example",
+    srcs = ["main.c"],
+    stamp = 1,
+    deps = [":stamp_lib"],
+)
+
+cc_library(
+    name = "stamp_lib",
+    linkstamp = "linkstamp.cc",
+)
+
+# When targeting a library you cannot use the top level 'stamp = 1' attr so you have to use an approach like this with a genrule
+cc_binary(
+    name = "genrule_example",
     srcs = [
         "main.c",
         "stamp.c",
