@@ -27,7 +27,8 @@ genrule(
 set -euo pipefail
 
 build_host=$$(sed -n -E 's/^BUILD_HOST (.*)$$/\\1/p' < bazel-out/stable-status.txt)
-build_scm_revision=$$(sed -n -E 's/^BUILD_SCM_REVISION ([0-9a-f]{40})$$/\\1/p' < bazel-out/volatile-status.txt)
+# A custom variable can be used for genrule but not cc_library https://github.com/bazelbuild/bazel/issues/4863
+build_scm_revision=$$(sed -n -E 's/^CUSTOM_COMMIT_VARIABLE ([0-9a-f]{40})$$/\\1/p' < bazel-out/volatile-status.txt)
 
 if [[ -z "$$build_host" || -z "$$build_scm_revision" ]]; then
   echo "error: failed to fetch variables" >&2
