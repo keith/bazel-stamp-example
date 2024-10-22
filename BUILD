@@ -26,9 +26,17 @@ genrule(
     cmd = """
 set -euo pipefail
 
+build_host=$$(sed -n -E 's/^BUILD_HOST (.*)$$/\\1/p' < bazel-out/stable-status.txt)
 build_scm_revision=$$(sed -n -E 's/^BUILD_SCM_REVISION ([0-9a-f]{40})$$/\\1/p' < bazel-out/volatile-status.txt)
 
-echo "extern const char build_scm_revision[];" > $(OUTS)
+if [[ -z "$$build_host" || -z "$$build_scm_revision" ]]; then
+  echo "error: failed to fetch variables" >&2
+  exit 1
+fi
+
+echo "extern const char build_host[];" > $(OUTS)
+echo "extern const char build_scm_revision[];" >> $(OUTS)
+echo "const char build_host[] = \\"$$build_host\\";" >> $(OUTS)
 echo "const char build_scm_revision[] = \\"$$build_scm_revision\\";" >> $(OUTS)
     """,
     # https://github.com/bazelbuild/bazel/issues/4942
